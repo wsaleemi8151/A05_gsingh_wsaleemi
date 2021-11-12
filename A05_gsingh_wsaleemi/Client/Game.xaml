@@ -1,0 +1,28 @@
+﻿<Window x:Name="Game_window" x:Class="Client.Game"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Client"
+        mc:Ignorable="d"
+        Title="Game" Height="450" Width="800" ResizeMode="NoResize" Closing="Game_window_Closing">
+    <Grid Margin="10">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Label>Range:</Label>
+        <Label x:Name="Output_Range" Grid.Column="1" Height="27" VerticalAlignment="Top" HorizontalAlignment="Left" Width="220" Grid.RowSpan="2" />
+        <Label Grid.Row="1">Guess number:</Label>
+        <TextBox x:Name="Input_Guess" Grid.Column="1" Margin="0,1.4,0,0" HorizontalAlignment="Left" Width="220" Height="24" VerticalAlignment="Top" Grid.Row="1" MouseEnter="Input_Guess_MouseEnter" />
+        <Label Grid.Row="2" Height="344" VerticalAlignment="Bottom">Result:</Label>
+        <Label x:Name="Output_Result" Grid.Row="2" Grid.Column="1" Margin="0,0.8,0,0" HorizontalAlignment="Left" Width="370" Height="26" VerticalAlignment="Top"  />
+        <Button x:Name="Guess_Submit" Grid.Row="2" Margin="220.6,37.8,0,0" Grid.Column="1" HorizontalAlignment="Left" Width="82" Height="26" VerticalAlignment="Top" Content="Make Guess" Click="Guess_Submit_Click" />
+        <Button x:Name="Exit_Game" Content="Exit Game" Grid.Column="1" HorizontalAlignment="Left" Margin="341,38,0,0" Grid.Row="2" VerticalAlignment="Top" Width="82" Height="26" RenderTransformOrigin="3.335,-1.635" Click="Exit_Game_Click"/>
+    </Grid>
+</Window>
