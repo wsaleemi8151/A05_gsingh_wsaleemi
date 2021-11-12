@@ -21,11 +21,10 @@ namespace Client
     /// </summary>
     public partial class Game : Window
     {
-        
+
         private static int miniNo;
         private static int maxxNo;
         private static int inputNo;
-        private static int rightGuess;
         private static bool gameComplete;
 
 
@@ -46,11 +45,6 @@ namespace Client
             set { inputNo = value; }
         }
 
-        public static int RightGuess
-        {
-            get { return rightGuess; }
-            set { rightGuess = value; }
-        }
 
         public static bool GameComplete
         {
@@ -64,10 +58,10 @@ namespace Client
         {
             InitializeComponent();
 
-            //---Values to be came from the server
-            MiniNo = 1;
-            MaxxNo = 100;
-            RightGuess = 50;
+            // Values comes from client status class
+            MiniNo = ClientStatus.MinRange;
+            MaxxNo = ClientStatus.MaxRange;
+            Title = $"Hello {ClientStatus.Name}, Please make a guess!!!";
 
             //Displaying range
             Output_Range.Content = MiniNo + "-" + MaxxNo;
@@ -81,42 +75,81 @@ namespace Client
             Submit();
         }
 
-
-
+        /*
+        * FUNCTION : Submit
+        *
+        * DESCRIPTION : This function is used to validate and submit user guess
+        *
+        * PARAMETERS : none
+        *
+        */
         private void Submit()
         {
-
             //check if no nuber is entered
             if (Input_Guess.Text != "")
             {
-                inputNo = int.Parse(Input_Guess.Text);
-
-                if (inputNo < 0) //check if imput number is negative
+                if (int.TryParse(Input_Guess.Text.Trim(), out inputNo) == false) // check if imput for guess is not a number
+                {
+                    Output_Result.Content = "Invalid: Guess number must be a number";
+                    Input_Guess.Text = "";
+                }
+                else if (inputNo < 0) // check if imput number is negative
                 {
                     Output_Result.Content = "Invalid: Guess number cannot be negative";
                     Input_Guess.Text = "";
                 }
-                else if (inputNo > MaxxNo) //check if it is high
+                else if (inputNo > MaxxNo) // check if it is high
                 {
-                    Output_Result.Content = "Guess number is too high,";
+                    Output_Result.Content = "Invalid: Guess number must be in the range";
                     Input_Guess.Text = "";
                 }
-                else if (inputNo < MiniNo) //check if it is low
+                else if (inputNo < MiniNo) // check if it is low
                 {
-                    Output_Result.Content = "Guess number is too low";
+                    Output_Result.Content = "Invalid: Guess number must be in the range";
                     Input_Guess.Text = "";
                 }
-                else if (inputNo == RightGuess) //check if it is right guess
+                else
                 {
-                    Output_Result.Content = "-----YOU WIN!!-----";
-                    Input_Guess.Text = "";
-                    Win(); //calling Win() function
-                }
-                else //if number is not right
-                {
-                    Output_Result.Content = "-----NOT RIGHT GUESS-----";
-                    Input_Guess.Text = "";
-                    Update_Range(); //Calling Update_Range function 
+                    //  Default template for make a guess is: "MakeAGuess;guid=guid;guess=number"
+                    string response = Communicator.ConnectClient(ClientStatus.serverIP, ClientStatus.port, $"MakeAGuess;guid={ClientStatus.Guid};guess={InputNo}");
+
+                    if (response.StartsWith("YouWin")) // check if it is right guess
+                    {
+                        Output_Result.Content = "-----YOU WIN!!-----";
+                        Input_Guess.Text = "";
+                        Win(); //calling Win() function
+                    }
+                    else //if number is not right
+                    {
+
+                        // Default template for response to an incorrect guess: "hiLo=high/low;maxRange=MaxRange;minRange=MinRange"
+                        string[] responseArray = response.Split(';');
+
+                        if (responseArray.Length == 3)
+                        {
+                            try
+                            {
+                                string hiLo = responseArray[0].Split('=')[1];    // index 0 of request array would have high/low
+                                int maxRange = Convert.ToInt32(responseArray[1].Split('=')[1]);  // index 1 of request array would have updated max range
+                                int minRange = Convert.ToInt32(responseArray[2].Split('=')[1]);  // index 2 of request array would have updated min range
+
+                                Output_Result.Content = $"-----Guess is too {hiLo}-----";
+
+                                ClientStatus.MaxRange = maxRange;
+                                ClientStatus.MinRange = minRange;
+                            }
+                            catch (Exception)
+                            {
+                                Output_Result.Content = "Invalid response from the server";
+                            }
+                        }
+                        else
+                        {
+                            Output_Result.Content = "Invalid response from the server";
+                        }
+
+                        Update_Range(); //Calling Update_Range function 
+                    }
                 }
             }
             else //if no number is entered
@@ -131,11 +164,10 @@ namespace Client
         private void Update_Range()
         {
             //----values to come from the server
-            MiniNo = 10;
-            MaxxNo = 50;
-            RightGuess = 20;
+            MiniNo = ClientStatus.MinRange;
+            MaxxNo = ClientStatus.MaxRange;
 
-            //Display new range
+            //Displaying range
             Output_Range.Content = MiniNo + "-" + MaxxNo;
             Input_Guess.Text = "";
         }
@@ -155,11 +187,36 @@ namespace Client
             if (result == System.Windows.Forms.DialogResult.Yes)
             {
                 Output_Result.Content = "";
-                Update_Range();
+                string response = Communicator.ConnectClient(ClientStatus.serverIP, ClientStatus.port, $"StartOver;guid={ClientStatus.Guid}");
+
+                // Default template for response to StartOver: "Success;maxRange=MaxRange;minRange=MinRange"
+                string[] responseArray = response.Split(';');
+
+                if (responseArray.Length == 3)
+                {
+                    try
+                    {
+                        int maxRange = Convert.ToInt32(responseArray[1].Split('=')[1]);  // index 1 of request array would have updated max range
+                        int minRange = Convert.ToInt32(responseArray[2].Split('=')[1]);  // index 2 of request array would have updated min range
+
+                        ClientStatus.MaxRange = maxRange;
+                        ClientStatus.MinRange = minRange;
+                        Update_Range(); //Calling Update_Range function 
+                    }
+                    catch (Exception)
+                    {
+                        Output_Result.Content = "Invalid response from the server";
+                    }
+                }
+                else
+                {
+                    Output_Result.Content = "Invalid response from the server";
+                }
+
             }
             else
             {
-                Environment.Exit(1);
+                SafeExit();
             }
 
         }
@@ -173,7 +230,7 @@ namespace Client
 
             if (GameComplete == true)
             {
-                Environment.Exit(1);
+                SafeExit();
             }
             else
             {
@@ -183,7 +240,7 @@ namespace Client
                 DialogResult result = MessageBox.Show(message, title, buttons);
                 if (result == System.Windows.Forms.DialogResult.Yes)
                 {
-                    Environment.Exit(1);
+                    SafeExit();
                 }
                 else
                 {
@@ -191,10 +248,10 @@ namespace Client
                 }
 
             }
-              
+
         }
 
-      
+
 
         private void Input_Guess_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
         {
@@ -213,9 +270,27 @@ namespace Client
             DialogResult result = MessageBox.Show(message, title, buttons);
             if (result == System.Windows.Forms.DialogResult.Yes)
             {
+                SafeExit();
+            }
+
+        }
+
+        private void SafeExit()
+        {
+
+            //  Default template for Leave is: "Leave;guid=guid"
+            string response = Communicator.ConnectClient(ClientStatus.serverIP, ClientStatus.port, $"Leave;guid={ClientStatus.Guid}");
+
+            // Default template for response to Leave: "Success"
+            if (response.StartsWith("Success"))
+            {
                 Environment.Exit(1);
             }
-          
+            else
+            {
+                Environment.Exit(0);
+            }
+
         }
     }
 }

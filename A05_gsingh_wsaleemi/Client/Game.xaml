@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Client"
         mc:Ignorable="d"
-        Title="Game" Height="450" Width="800" ResizeMode="NoResize" Closing="Game_window_Closing">
+        Title="Game" Height="450" Width="800" ResizeMode="NoResize" Closing="Game_window_Closing" WindowStartupLocation="CenterScreen">
     <Grid Margin="10">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />

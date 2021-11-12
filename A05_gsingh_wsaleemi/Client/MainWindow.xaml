@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Client"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800" ResizeMode="NoResize">
+        Title="MainWindow" Height="450" Width="800" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
     <Grid Margin="10">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
@@ -20,8 +20,8 @@
         <TextBox x:Name="Input_IP" Grid.Column="1" Margin="0.4,0,0,0" Height="17" VerticalAlignment="Top" HorizontalAlignment="Left" Width="220" />
         <Label Grid.Row="1">Port number:</Label>
         <TextBox x:Name="Input_Port" Grid.Column="1" Margin="0.4,27,0,0" Grid.RowSpan="2" HorizontalAlignment="Left" Width="220" Height="18" VerticalAlignment="Top" />
-        <Label Grid.Row="2">Port name:</Label>
-        <TextBox x:Name="Input_Port_Name" Grid.Row="2" Grid.Column="1" Margin="0.4,0.8,0,0" HorizontalAlignment="Left" Width="220" Height="19" VerticalAlignment="Top"  />
+        <Label Grid.Row="2">Name:</Label>
+        <TextBox x:Name="Input_Name" Grid.Row="2" Grid.Column="1" Margin="0.4,0.8,0,0" HorizontalAlignment="Left" Width="220" Height="19" VerticalAlignment="Top"  />
         <Button x:Name="Submit_btn" Grid.Row="2" Margin="220.6,37.8,0,0" Grid.Column="1" HorizontalAlignment="Left" Width="82" Height="26" VerticalAlignment="Top" Content="Submit" Click="Submit_btn_Click"/>
     </Grid>
 </Window>
